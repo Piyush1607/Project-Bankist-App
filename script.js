@@ -74,3 +74,28 @@ const currencies = new Map([
 const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 
 /////////////////////////////////////////////////
+
+// DISPLAYING THE TRANSACTIONS IN A LIST STYLE
+const displayMovements = function(movements){ // passing the movements array as arguements
+  containerMovements.innerHTML=''; // clearing all HTML inside the element
+  // cleared the past entries
+
+  // using forEach to add the transactions
+  // mov -> current element , i -> index of the element
+  movements.forEach(function(mov,i){ 
+    // here we will use HTML TEMPLATE STRINGS to add HTML elements
+    const type = mov >0 ? 'deposit' : 'withdrawal';
+    const transaction = 
+    `<div class="movements__row">
+      <div class="movements__type movements__type--${type}">${i+1} ${type}</div>
+      <div class="movements__value">${mov}</div>
+    </div>`;
+
+    // this is a very good use of template strings ``
+
+    // now inserting DOM elements using the  insertAdjacentHTML method
+    containerMovements.insertAdjacentHTML('afterbegin',transaction);
+  })
+}
+
+displayMovements(account1.movements);
