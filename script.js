@@ -107,3 +107,11 @@ const displayBalance=function(movements){
 }
 
 displayBalance(account1.movements)
+
+//displaying account summary 
+const displaySummary=function(movements){
+  labelSumIn.textContent = `${movements.filter(mov=>mov>0).reduce((acc,depo)=>acc+depo,0)}€`;
+  labelSumOut.textContent= `${movements.filter(mov=>mov<0).reduce((acc,depo)=>acc+Math.abs(depo),0)}€`;
+  labelSumInterest.textContent = `${movements.filter(mov=>mov>0).map(mov=>mov*1.2/100).filter(inte=>inte>1).reduce((acc,inte)=>acc+inte,0)}€`
+}
+displaySummary(account1.movements)
