@@ -99,3 +99,11 @@ const displayMovements = function(movements){ // passing the movements array as 
 }
 
 displayMovements(account1.movements);
+
+// DISPLAYING THE ACCOUNT BALANCE
+const displayBalance=function(movements){
+  const balance = movements.reduce((acc,curr)=>acc+curr,0);
+  labelBalance.textContent=`${balance} $`;
+}
+
+displayBalance(account1.movements)
