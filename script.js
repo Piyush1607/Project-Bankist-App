@@ -98,20 +98,59 @@ const displayMovements = function(movements){ // passing the movements array as 
   })
 }
 
-displayMovements(account1.movements);
-
 // DISPLAYING THE ACCOUNT BALANCE
 const displayBalance=function(movements){
   const balance = movements.reduce((acc,curr)=>acc+curr,0);
   labelBalance.textContent=`${balance} $`;
 }
 
-displayBalance(account1.movements)
-
 //displaying account summary 
-const displaySummary=function(movements){
-  labelSumIn.textContent = `${movements.filter(mov=>mov>0).reduce((acc,depo)=>acc+depo,0)}€`;
-  labelSumOut.textContent= `${movements.filter(mov=>mov<0).reduce((acc,depo)=>acc+Math.abs(depo),0)}€`;
-  labelSumInterest.textContent = `${movements.filter(mov=>mov>0).map(mov=>mov*1.2/100).filter(inte=>inte>1).reduce((acc,inte)=>acc+inte,0)}€`
+const displaySummary=function(account){
+  labelSumIn.textContent = `${account.movements.filter(mov=>mov>0).reduce((acc,depo)=>acc+depo,0)}€`;
+  labelSumOut.textContent= `${account.movements.filter(mov=>mov<0).reduce((acc,depo)=>acc+Math.abs(depo),0)}€`;
+  labelSumInterest.textContent = `${account.movements.filter(mov=>mov>0).map(mov=>mov*account.interestRate/100).filter(inte=>inte>1).reduce((acc,inte)=>acc+inte,0)}€`
 }
-displaySummary(account1.movements)
+
+// creating usernames 
+const createUserName = function(accs){
+  accs.forEach(function(acc){
+    acc.username =acc.owner.toLowerCase().split(' ').map((name)=>name[0]).join('');
+  });
+}
+createUserName(accounts);
+
+//------------------LOGIN EVENT------------------------------------
+//Event handler
+
+let currentAccount;
+btnLogin.addEventListener('click',function(e){
+  //prevent submitting form
+  e.preventDefault();
+  // in forms , enter is automatically triggered as clicking the sumbit button
+
+  currentAccount=accounts.find(acc=>acc.username===inputLoginUsername.value)
+  //optional chaining is done so if an account does not exits , it doesn't throw error
+  if(currentAccount?.pin===Number(inputLoginPin.value)) {
+    console.log('LOGIN');
+    // if LOGIN is SUCCESSFULL
+
+    // display UI and Message
+    labelWelcome.textContent =`Welcome back , ${currentAccount.owner.split(' ')[0]}` // first name only
+    containerApp.style.opacity =100;
+
+    //clearing login credentials
+    inputLoginPin.value=inputLoginUsername.value=''
+
+    // removing focus/cursor from the pin section
+    inputLoginPin.blur()
+
+    //display movements/transactions
+    displayMovements(currentAccount.movements)
+
+    //display balance
+    displayBalance(currentAccount.movements)
+
+    //display summary
+    displaySummary(currentAccount)
+  }
+})
