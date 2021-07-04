@@ -99,9 +99,9 @@ const displayMovements = function(movements){ // passing the movements array as 
 }
 
 // DISPLAYING THE ACCOUNT BALANCE
-const displayBalance=function(movements){
-  const balance = movements.reduce((acc,curr)=>acc+curr,0);
-  labelBalance.textContent=`${balance} $`;
+const displayBalance=function(acc){
+  acc.balance = acc.movements.reduce((acc,curr)=>acc+curr,0);
+  labelBalance.textContent=`${acc.balance} $`;
 }
 
 //displaying account summary 
@@ -118,6 +118,17 @@ const createUserName = function(accs){
   });
 }
 createUserName(accounts);
+
+//UPDATE UI
+function upddateUI(acc) {
+  displayMovements(acc.movements);
+
+  //display balance
+  displayBalance(acc);
+
+  //display summary
+  displaySummary(acc);
+}
 
 //------------------LOGIN EVENT------------------------------------
 //Event handler
@@ -144,13 +155,30 @@ btnLogin.addEventListener('click',function(e){
     // removing focus/cursor from the pin section
     inputLoginPin.blur()
 
-    //display movements/transactions
-    displayMovements(currentAccount.movements)
-
-    //display balance
-    displayBalance(currentAccount.movements)
-
-    //display summary
-    displaySummary(currentAccount)
+    //UPDATING UI
+    upddateUI(currentAccount);
   }
 })
+
+// Implementing Transfers
+btnTransfer.addEventListener('click',function(e){
+  // prevent reloading
+  e.preventDefault();
+  const amount = Number (inputTransferAmount.value);
+  const receiverAcc = accounts.find(acc=>acc.username===inputTransferTo.value)
+  
+  //checking if we have sufficient funds and we don't transfer to ourselves
+
+  if(amount>0 && amount<=currentAccount.balance &&receiverAcc&& receiverAcc?.username !== currentAccount.username){
+    console.log('Transfer Valid');
+    
+    //Transferring money
+    currentAccount.movements.push(-amount)
+    receiverAcc.movements.push(amount)
+
+    //updating UI
+    upddateUI(currentAccount);
+  }
+})
+
+
