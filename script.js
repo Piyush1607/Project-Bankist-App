@@ -76,14 +76,11 @@ const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 /////////////////////////////////////////////////
 
 // DISPLAYING THE TRANSACTIONS IN A LIST STYLE
-const displayMovements = function(movements){ // passing the movements array as arguements
-  containerMovements.innerHTML=''; // clearing all HTML inside the element
-  // cleared the past entries
+const displayMovements = function(movements,sort=false){ 
+  containerMovements.innerHTML='';
 
-  // using forEach to add the transactions
-  // mov -> current element , i -> index of the element
-  movements.forEach(function(mov,i){ 
-    // here we will use HTML TEMPLATE STRINGS to add HTML elements
+  movs=sort?movements.slice().sort((a,b)=>a-b):movements;
+  movs.forEach(function(mov,i){ 
     const type = mov >0 ? 'deposit' : 'withdrawal';
     const transaction = 
     `<div class="movements__row">
@@ -91,9 +88,6 @@ const displayMovements = function(movements){ // passing the movements array as 
       <div class="movements__value">${mov}</div>
     </div>`;
 
-    // this is a very good use of template strings ``
-
-    // now inserting DOM elements using the  insertAdjacentHTML method
     containerMovements.insertAdjacentHTML('afterbegin',transaction);
   })
 }
@@ -207,4 +201,11 @@ btnLoan.addEventListener('click',function(e){
   inputLoanAmount.value='';
 });
 
+// SORTING OPTION
+let sorted = false // variabel to toggle sort
+btnSort.addEventListener('click',function(e){
+  e.preventDefault();
+  displayMovements(currentAccount.movements,!sorted)
+  sorted = !sorted;
+})
 
