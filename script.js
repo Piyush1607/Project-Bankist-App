@@ -114,7 +114,7 @@ const createUserName = function(accs){
 createUserName(accounts);
 
 //UPDATE UI
-function upddateUI(acc) {
+function updateUI(acc) {
   displayMovements(acc.movements);
 
   //display balance
@@ -150,7 +150,7 @@ btnLogin.addEventListener('click',function(e){
     inputLoginPin.blur()
 
     //UPDATING UI
-    upddateUI(currentAccount);
+    updateUI(currentAccount);
   }
 })
 
@@ -171,7 +171,7 @@ btnTransfer.addEventListener('click',function(e){
     receiverAcc.movements.push(amount)
 
     //updating UI
-    upddateUI(currentAccount);
+    updateUI(currentAccount);
   }
 })
 
