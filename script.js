@@ -181,4 +181,18 @@ btnTransfer.addEventListener('click',function(e){
   }
 })
 
+// DELETING Account 
+btnClose.addEventListener('click',function(e){
+  e.preventDefault();
+  console.log('delete')
+  if(inputCloseUsername.value===currentAccount.username && Number(inputClosePin.value)===currentAccount.pin){
+    const index = accounts.findIndex(acc=>acc.username===currentAccount.username)
+    //delete the account
+    accounts.splice(index,1);
+    //log out the user  
+    containerApp.style.opacity=0;
+  }
+  //clearing credentials
+  inputClosePin.value=inputCloseUsername.value='';
+})
 
