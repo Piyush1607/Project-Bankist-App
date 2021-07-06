@@ -82,20 +82,29 @@ const currencies = new Map([
 ]);
 
 const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
-
+const EUR ='€'
 /////////////////////////////////////////////////
 
 // DISPLAYING THE TRANSACTIONS IN A LIST STYLE
-const displayMovements = function(movements,sort=false){ 
+const displayMovements = function(acc,sort=false){ 
   containerMovements.innerHTML='';
 
-  const movs=sort?movements.slice().sort((a,b)=>a-b):movements;
+  const movs=sort?acc.movements.slice().sort((a,b)=>a-b):acc.movements;
   movs.forEach(function(mov,i){ 
     const type = mov >0 ? 'deposit' : 'withdrawal';
+
+    //dates
+    const date = new Date (acc.movementsDates[i]);
+    const year = date.getFullYear()
+    const day = `${date.getDay()}`.padStart(2,0)
+    const month = `${date.getMonth()+1}`.padStart(2,0) // 0 based
+    const displayDate = `${day}/${month}/${year}`
+
     const transaction = 
     `<div class="movements__row">
       <div class="movements__type movements__type--${type}">${i+1} ${type}</div>
-      <div class="movements__value">${mov.toFixed(2)}</div>
+      <div class="movements__date">${displayDate}</div>
+      <div class="movements__value">${mov.toFixed(2)}€</div>
     </div>`;
 
     containerMovements.insertAdjacentHTML('afterbegin',transaction);
@@ -125,7 +134,7 @@ createUserName(accounts);
 
 //UPDATE UI
 function updateUI(acc) {
-  displayMovements(acc.movements);
+  displayMovements(acc);
 
   //display balance
   displayBalance(acc);
@@ -159,6 +168,15 @@ btnLogin.addEventListener('click',function(e){
     // removing focus/cursor from the pin section
     inputLoginPin.blur()
 
+    // adding date in our app
+    const today = new Date();
+    const year = today.getFullYear();
+    const day = `${today.getDay()}`.padStart(2, 0);
+    const month = `${today.getMonth() + 1}`.padStart(2, 0); // 0 based
+    const hours = today.getHours();
+    const mins = `${today.getMinutes()}`.padStart(2,0);
+    labelDate.textContent = `${day}/${month}/${year} ${hours}:${mins}`;
+
     //UPDATING UI
     updateUI(currentAccount);
   }
@@ -179,6 +197,10 @@ btnTransfer.addEventListener('click',function(e){
     //Transferring money
     currentAccount.movements.push(-amount)
     receiverAcc.movements.push(amount)
+
+    // add date 
+    currentAccount.movementsDates.push(new Date().toISOString());
+    receiverAcc.movementsDates.push(new Date().toISOString());
 
     //updating UI
     updateUI(currentAccount);
@@ -206,6 +228,8 @@ btnLoan.addEventListener('click',function(e){
   const reqLoan = Number(inputLoanAmount.value);
   if(currentAccount.movements.some(mov=> mov >= reqLoan*0.1) && reqLoan>0 ){
     currentAccount.movements.push(reqLoan);
+    // add date
+    currentAccount.movementsDates.push(new Date().toISOString());    
     updateUI(currentAccount);
   }
   inputLoanAmount.value='';
