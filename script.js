@@ -95,7 +95,7 @@ const displayMovements = function(movements,sort=false){
     const transaction = 
     `<div class="movements__row">
       <div class="movements__type movements__type--${type}">${i+1} ${type}</div>
-      <div class="movements__value">${mov}</div>
+      <div class="movements__value">${mov.toFixed(2)}</div>
     </div>`;
 
     containerMovements.insertAdjacentHTML('afterbegin',transaction);
@@ -105,14 +105,14 @@ const displayMovements = function(movements,sort=false){
 // DISPLAYING THE ACCOUNT BALANCE
 const displayBalance=function(acc){
   acc.balance = acc.movements.reduce((acc,curr)=>acc+curr,0);
-  labelBalance.textContent=`${acc.balance} $`;
+  labelBalance.textContent=`${acc.balance.toFixed(2)} $`;
 }
 
 //displaying account summary 
 const displaySummary=function(account){
-  labelSumIn.textContent = `${account.movements.filter(mov=>mov>0).reduce((acc,depo)=>acc+depo,0)}€`;
-  labelSumOut.textContent= `${account.movements.filter(mov=>mov<0).reduce((acc,depo)=>acc+Math.abs(depo),0)}€`;
-  labelSumInterest.textContent = `${account.movements.filter(mov=>mov>0).map(mov=>mov*account.interestRate/100).filter(inte=>inte>1).reduce((acc,inte)=>acc+inte,0)}€`
+  labelSumIn.textContent = `${account.movements.filter(mov=>mov>0).reduce((acc,depo)=>acc+depo,0).toFixed(2)}€`;
+  labelSumOut.textContent= `${account.movements.filter(mov=>mov<0).reduce((acc,depo)=>acc+Math.abs(depo),0).toFixed(2)}€`;
+  labelSumInterest.textContent = `${account.movements.filter(mov=>mov>0).map(mov=>mov*account.interestRate/100).filter(inte=>inte>1).reduce((acc,inte)=>acc+inte,0).toFixed(2)}€`
 }
 
 // creating usernames 
