@@ -239,7 +239,7 @@ btnLoan.addEventListener('click',function(e){
 let sorted = false // variabel to toggle sort
 btnSort.addEventListener('click',function(e){
   e.preventDefault();
-  displayMovements(currentAccount.movements,!sorted)
+  displayMovements(currentAccount,!sorted)
   sorted = !sorted;
 })
 
