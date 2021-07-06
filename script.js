@@ -205,6 +205,8 @@ btnTransfer.addEventListener('click',function(e){
     //updating UI
     updateUI(currentAccount);
   }
+
+  inputTransferAmount.value=inputTransferTo.value='';
 })
 
 // DELETING Account 
