@@ -85,6 +85,29 @@ const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 const EUR ='€'
 /////////////////////////////////////////////////
 
+// FUNCTIONS
+
+//date formatter
+const formatMovementDate = function (date, locale) {
+  const calcDaysPassed = (date1, date2) =>
+    Math.round(Math.abs(date2 - date1) / (1000 * 60 * 60 * 24));
+
+  const daysPassed = calcDaysPassed(new Date(), date);
+  if (daysPassed === 0) return 'Today';
+  if (daysPassed === 1) return 'Yesterday';
+  if (daysPassed <= 7) return `${daysPassed} days ago`;
+
+  return new Intl.DateTimeFormat(locale).format(date);
+};
+
+// currency formatter
+const formatCurr = function(value,locale,curr){
+  return new Intl.NumberFormat(locale,{
+    style : 'currency',
+    currency : curr
+  }).format(value)
+}
+
 // DISPLAYING THE TRANSACTIONS IN A LIST STYLE
 const displayMovements = function(acc,sort=false){ 
   containerMovements.innerHTML='';
@@ -95,16 +118,13 @@ const displayMovements = function(acc,sort=false){
 
     //dates
     const date = new Date (acc.movementsDates[i]);
-    const year = date.getFullYear()
-    const day = `${date.getDay()}`.padStart(2,0)
-    const month = `${date.getMonth()+1}`.padStart(2,0) // 0 based
-    const displayDate = `${day}/${month}/${year}`
-
+    const displayDate = formatMovementDate(date, acc.locale);
+    const formattedMov = formatCurr(mov,acc.locale,acc.currency)
     const transaction = 
     `<div class="movements__row">
       <div class="movements__type movements__type--${type}">${i+1} ${type}</div>
       <div class="movements__date">${displayDate}</div>
-      <div class="movements__value">${mov.toFixed(2)}€</div>
+      <div class="movements__value">${formattedMov}</div>
     </div>`;
 
     containerMovements.insertAdjacentHTML('afterbegin',transaction);
@@ -114,15 +134,31 @@ const displayMovements = function(acc,sort=false){
 // DISPLAYING THE ACCOUNT BALANCE
 const displayBalance=function(acc){
   acc.balance = acc.movements.reduce((acc,curr)=>acc+curr,0);
-  labelBalance.textContent=`${acc.balance.toFixed(2)} $`;
+  labelBalance.textContent = `${formatCurr(acc.balance,acc.locale,acc.currency)}`;
 }
 
 //displaying account summary 
-const displaySummary=function(account){
-  labelSumIn.textContent = `${account.movements.filter(mov=>mov>0).reduce((acc,depo)=>acc+depo,0).toFixed(2)}€`;
-  labelSumOut.textContent= `${account.movements.filter(mov=>mov<0).reduce((acc,depo)=>acc+Math.abs(depo),0).toFixed(2)}€`;
-  labelSumInterest.textContent = `${account.movements.filter(mov=>mov>0).map(mov=>mov*account.interestRate/100).filter(inte=>inte>1).reduce((acc,inte)=>acc+inte,0).toFixed(2)}€`
-}
+const displaySummary = function (acc) {
+  const incomes = acc.movements
+    .filter(mov => mov > 0)
+    .reduce((acc, mov) => acc + mov, 0);
+  labelSumIn.textContent = `${formatCurr(incomes,acc.locale,acc.currency)}`;
+
+  const out = acc.movements
+    .filter(mov => mov < 0)
+    .reduce((acc, mov) => acc + mov, 0);
+  labelSumOut.textContent = `${formatCurr(Math.abs(out),acc.locale,acc.currency)}`;
+
+  const interest = acc.movements
+    .filter(mov => mov > 0)
+    .map(deposit => (deposit * acc.interestRate) / 100)
+    .filter(int => {
+      // console.log(arr);
+      return int >= 1;
+    })
+    .reduce((acc, int) => acc + int, 0);
+  labelSumInterest.textContent = `${formatCurr(interest,acc.locale,acc.currency)}`;
+};
 
 // creating usernames 
 const createUserName = function(accs){
@@ -170,12 +206,14 @@ btnLogin.addEventListener('click',function(e){
 
     // adding date in our app
     const today = new Date();
-    const year = today.getFullYear();
-    const day = `${today.getDay()}`.padStart(2, 0);
-    const month = `${today.getMonth() + 1}`.padStart(2, 0); // 0 based
-    const hours = today.getHours();
-    const mins = `${today.getMinutes()}`.padStart(2,0);
-    labelDate.textContent = `${day}/${month}/${year} ${hours}:${mins}`;
+    const options={
+      hour : 'numeric',
+      minute :'numeric',
+      day :'numeric',
+      month : 'long', //'numeric',
+      year :'numeric'
+    }
+    labelDate.textContent = new Intl.DateTimeFormat(currentAccount.locale,options).format(today);
 
     //UPDATING UI
     updateUI(currentAccount);
