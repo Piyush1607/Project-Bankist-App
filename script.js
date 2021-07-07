@@ -87,6 +87,27 @@ const EUR ='€'
 
 // FUNCTIONS
 
+// LogOut if Inactive for certain time
+const startLogOutTimer=function(){
+  let time = 300;
+
+  const tick=function(){
+    const min = String(Math.trunc(time/60)).padStart(2,0)
+    const sec = String(Math.trunc(time%60)).padStart(2,0)
+    labelTimer.textContent=`${min}:${sec}`
+    
+    if(time===0){
+      clearInterval(timer)
+      containerApp.style.opacity=0;
+      labelWelcome.textContent=`Log in to get started`
+    }
+    time--
+  }
+  tick()
+  const timer=setInterval(tick,1000)
+  return timer;
+}
+
 //date formatter
 const formatMovementDate = function (date, locale) {
   const calcDaysPassed = (date1, date2) =>
@@ -182,7 +203,7 @@ function updateUI(acc) {
 //------------------LOGIN EVENT------------------------------------
 //Event handler
 
-let currentAccount;
+let currentAccount,timer;
 btnLogin.addEventListener('click',function(e){
   //prevent submitting form
   e.preventDefault();
@@ -214,7 +235,10 @@ btnLogin.addEventListener('click',function(e){
       year :'numeric'
     }
     labelDate.textContent = new Intl.DateTimeFormat(currentAccount.locale,options).format(today);
-
+    //if there exist any timer , then we stop it
+    if(timer) clearInterval(timer)
+    //starting LogOut Timer
+    timer =startLogOutTimer()
     //UPDATING UI
     updateUI(currentAccount);
   }
@@ -242,6 +266,11 @@ btnTransfer.addEventListener('click',function(e){
 
     //updating UI
     updateUI(currentAccount);
+    
+    //Resetting Timer
+    clearInterval(timer)
+    //starting LogOut Timer
+    timer =startLogOutTimer()
   }
 
   inputTransferAmount.value=inputTransferTo.value='';
@@ -267,10 +296,18 @@ btnLoan.addEventListener('click',function(e){
   e.preventDefault();
   const reqLoan = Number(inputLoanAmount.value);
   if(currentAccount.movements.some(mov=> mov >= reqLoan*0.1) && reqLoan>0 ){
-    currentAccount.movements.push(reqLoan);
-    // add date
-    currentAccount.movementsDates.push(new Date().toISOString());    
-    updateUI(currentAccount);
+    //timer for loan
+    setTimeout(function(){// Add movement
+      currentAccount.movements.push(reqLoan);
+      // add date
+      currentAccount.movementsDates.push(new Date().toISOString());
+      // Update UI
+      updateUI(currentAccount);
+      //Resetting timer
+      clearInterval(timer)
+      //starting LogOut Timer
+      timer =startLogOutTimer()
+      },1500)
   }
   inputLoanAmount.value='';
 });
